@@ -1,0 +1,212 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Removes horizontal scrollbar */
+    width: 100%;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px 10px;
+    background-color: #f4f4f9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.form-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 40px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+}
+
+input {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    font-size: 14px;
+    flex: 1 1 120px;
+    min-width: 0; /* Prevents overflow in flex containers */
+}
+
+input:focus {
+    border-color: #007bff;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    flex: 1 1 auto;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#receipt {
+    position: relative;
+    width: 800px; /* Fixed width for perfect PDF generation */
+    box-shadow: 0 4px 10px rgb(249, 0, 0);
+    border-radius: 8px;
+    overflow: hidden;
+    transform-origin: top center;
+}
+
+#template {
+    width: 100%;
+    display: block;
+    height: auto;
+}
+
+/* 
+  Using exact pixel positions. 
+  Responsiveness is handled by JS scale() so html2pdf works correctly. 
+*/
+
+#receipt div, #receipt table {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+}
+
+#receiptHeaderLeft {
+    position: absolute;
+    top: 190px;
+    left: 40px;
+    text-align: left;
+    line-height: 1.6;
+}
+
+#receiptHeaderRight {
+    position: absolute;
+    top: 190px;
+    right: 50px;
+    text-align: right;
+    line-height: 1.6;
+}
+
+#receiptTableContainer {
+    position: absolute;
+    top: 270px;
+    left: 20px;
+    width: 760px;
+    font-weight: bolder;
+}
+
+#poojaHeadingContainer {
+    position: absolute;
+    top: 235px;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #6b0f1a;
+}
+
+#receiptTable {
+    width: calc(100% - 16px); /* Adjusted to accommodate even margins */
+    margin: 0 8px; /* Even margin on both left and right sides */
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: center;
+}
+
+#receiptTable th {
+    border: 1px solid #4f0101;
+    border-right: none; /* Prevents double borders */
+    padding: 6px;
+    background-color: #bea70c9f;
+    font-weight: bold;
+    color: #4a0202f0;
+}
+
+#receiptTable th:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+#receiptTable th:last-child {
+    border-right: 1px solid #4f0101; /* Restore right border for the last cell */
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+#receiptTable td {
+    padding: 10px 6px;
+    font-weight: bold;
+
+}
+
+#grandTotalBox {
+    position: absolute;
+    bottom: 70px;
+    right: 40px;
+    background-color: #f8c51e72; /* Mustard yellow */
+    padding: 8px 40px;
+    font-size: 15px !important;
+    font-weight: bolder;
+    color: #000;
+    border-radius: 10px;
+}
+
+#dateText {
+    display: none;
+}
+
+/* --- Print Styles for Native PDF Saving --- */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+    
+    body {
+        background-color: white;
+    }
+
+    #receipt, #receipt * {
+        visibility: visible;
+    }
+
+    #receipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin: 0;
+        box-shadow: none;
+        transform: scale(1) !important;
+    }
+}

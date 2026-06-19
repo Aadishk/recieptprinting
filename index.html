@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Receipt Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h2>Receipt Generator</h2>
+
+    <div class="form-section">
+        <div class="global-section" style="width: 100%; display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
+            <input type="text" id="deity" placeholder="Deity Name">
+            <input type="text" id="pooja" placeholder="Pooja Name">
+            <input type="date" id="offeringDate" title="Offering Date">
+        </div>
+
+        <div id="lineItemsContainer" style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
+            <div class="line-item" style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" class="item-name" placeholder="Name">
+                <input type="text" list="starList" class="item-star" placeholder="Star">
+                <input type="number" class="item-quantity" placeholder="Qty" value="1" style="flex: 0 1 80px;">
+                <input type="number" class="item-amount" placeholder="Amount" style="flex: 0 1 100px;">
+                <button type="button" class="remove-btn" onclick="removeRow(this)" style="background-color: #dc3545; padding: 10px; flex: 0 0 auto;">X</button>
+            </div>
+        </div>
+        
+        <datalist id="starList">
+            <option value="അശ്വതി (Ashwathi)">
+            <option value="Rohini">
+            <option value="Bharani">
+            <option value="Chithirai">
+        </datalist>
+
+        <div style="width: 100%; display: flex; gap: 10px; margin-top: 15px;">
+            <button type="button" onclick="addNewRow()" style="background-color: #28a745;">
+                + Add New Row
+            </button>
+            <button type="button" onclick="generateReceipt()">
+                Generate Receipt
+            </button>
+            <button type="button" onclick="downloadPDF()">
+                Download PDF
+            </button>
+            <button type="button" onclick="toggleBackground()" style="background-color: #17a2b8;">
+                Switch Background
+            </button>
+        </div>
+    </div>
+
+    <div id="receipt">
+
+        <img
+            src="blank paper.png"
+            id="template">
+
+        <div id="receiptHeaderLeft" style="visibility: hidden;">
+            <div id="receiptNoContainer">Receipt No : <span id="receiptNoText"></span></div>
+            <div id="deityContainer">ദേവത : <span id="deityText"></span></div>
+        </div>
+        
+        <div id="receiptHeaderRight" style="visibility: hidden;">
+            <div id="bookingDateContainer">Booking Date : <span id="bookingDateText"></span></div>
+            <div id="offeringDateContainer">Offering Date : <span id="offeringDateText"></span></div>
+        </div>
+        
+        <div id="poojaHeadingContainer" style="visibility: hidden;">
+            വഴിപാട് : <span id="poojaHeadingText"></span>
+        </div>
+        
+        <div id="receiptTableContainer" style="visibility: hidden;">
+            <table id="receiptTable">
+                <thead>
+                    <tr>
+                        <th id="th-sno">ക്രമ no</th>
+                        <th id="th-name">പേര് </th>
+                        <th id="th-star">നക്ഷത്രം </th>
+                        <th id="th-quantity">എണ്ണം</th>
+                        <th id="th-amount">തുക</th>
+                    </tr>
+                </thead>
+                <tbody id="receiptTableBody">
+                    <!-- Rows will be dynamically injected here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="grandTotalBox" style="visibility: hidden;">
+        <span >ആകെ തുക :</span> &nbsp;&nbsp;<span id="totalAmountText"></span>
+        </div>
+
+        <div id="dateText"></div>
+
+    </div>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
