@@ -122,7 +122,7 @@ button:hover {
 }
 
 #poojaHeadingText{
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 900;
 }
 
@@ -131,14 +131,14 @@ button:hover {
     top: 235px;
     width: 100%;
     text-align: center;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     color: #6b0f1a;
 }
 
 #receiptTable {
     width: calc(100% - 16px); /* Adjusted to accommodate even margins */
-    margin: 0 8px; /* Even margin on both left and right sides */
+    margin: 0 10px; /* Even margin on both left and right sides */
     border-collapse: separate;
     border-spacing: 0;
     text-align: center;
