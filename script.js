@@ -103,7 +103,7 @@ function generateReceipt(){
         
         const tdAmt = document.createElement("td");
         tdAmt.className = "col-amount";
-        tdAmt.innerText = amtVal ? amtVal + "/-" : "";
+        tdAmt.innerText = amtVal ? amtVal + ".00" : "";
         tr.appendChild(tdAmt);
         
         tbody.appendChild(tr);
@@ -125,7 +125,7 @@ function generateReceipt(){
     });
 
     // Grand total
-    document.getElementById("totalAmountText").innerText = grandTotal ? grandTotal : "";
+    document.getElementById("totalAmountText").innerText = grandTotal ? grandTotal + "/-" : " ";
     const grandTotalBox = document.getElementById("grandTotalBox");
     grandTotalBox.style.display = hasAmount ? "" : "none";
 

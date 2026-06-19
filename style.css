@@ -10,7 +10,7 @@ html, body {
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Noto Sans Malayalam', sans-serif;
     padding: 20px 10px;
     background-color: #f4f4f9;
     display: flex;
@@ -119,6 +119,11 @@ button:hover {
     left: 20px;
     width: 760px;
     font-weight: bolder;
+}
+
+#poojaHeadingText{
+    font-size: 15px;
+    font-weight: 900;
 }
 
 #poojaHeadingContainer {
