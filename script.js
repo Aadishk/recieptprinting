@@ -176,8 +176,8 @@ function downloadPDF(){
         margin:       0,
         filename:     'Receipt.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, allowTaint: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, windowWidth: 820 },
+        jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(receipt).save().then(() => {
