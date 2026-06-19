@@ -168,9 +168,26 @@ function downloadPDF(){
     const receipt = document.getElementById("receipt");
     if (!receipt) return;
 
-    // Use the native browser print dialog which avoids ALL local file CORS issues!
-    // The user can simply select "Save as PDF" in the print prompt.
-    window.print();
+    // Temporarily remove scaling so the PDF captures the full resolution
+    const originalTransform = receipt.style.transform;
+    receipt.style.transform = 'scale(1)';
+
+    const opt = {
+        margin:       0,
+        filename:     'Receipt.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, allowTaint: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(receipt).save().then(() => {
+        // Restore the scaling after PDF generation
+        receipt.style.transform = originalTransform;
+    }).catch(err => {
+        console.error("PDF generation error: ", err);
+        alert("Failed to generate PDF. If you are opening this file locally (file://), your browser is blocking it due to security rules. Please use a local server (like VS Code Live Server) or deploy it.");
+        receipt.style.transform = originalTransform;
+    });
 }
 
 const stars = [
