@@ -186,11 +186,13 @@ button:hover {
     display: none;
 }
 
+@page {
+    size: auto;
+    margin: 0mm;
+}
+
 /* --- Print Styles for Native PDF Saving --- */
 @media print {
-    @page {
-        margin: 0;
-    }
 
     * {
         -webkit-print-color-adjust: exact !important;
@@ -203,6 +205,8 @@ button:hover {
     }
     
     body {
+        margin: 0;
+        padding: 0;
         background-color: white;
     }
 
