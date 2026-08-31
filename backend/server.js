@@ -333,16 +333,13 @@ app.delete('/api/receipts', (req, res) => {
 });
 
 // Serve Static Frontend Assets
-const rootDir = process.cwd();
+const rootDir = path.join(__dirname, '..');
 app.use(express.static(rootDir));
-app.use(express.static(__dirname));
+app.use('/assets', express.static(path.join(rootDir, 'assets')));
 
 // Fallback to index.html
 app.get('*', (req, res) => {
-    const indexPath = fs.existsSync(path.join(rootDir, 'index.html'))
-        ? path.join(rootDir, 'index.html')
-        : path.join(__dirname, 'index.html');
-    res.sendFile(indexPath);
+    res.sendFile(path.join(rootDir, 'index.html'));
 });
 
 if (require.main === module) {

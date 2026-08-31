@@ -366,9 +366,9 @@ function toggleBackground() {
     if (!templateImg) return;
 
     if (templateImg.src.includes("blank%20paper.png") || templateImg.src.includes("blank paper.png")) {
-        templateImg.src = "canvareceipt-1.png";
+        templateImg.src = "assets/canvareceipt-1.png";
     } else {
-        templateImg.src = "blank paper.png";
+        templateImg.src = "assets/blank paper.png";
     }
 }
 

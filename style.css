@@ -17,7 +17,7 @@ body {
 
 body {
     font-family: 'Outfit', 'Noto Sans Malayalam', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.4)), url('bgbckgroundimage.png') no-repeat center center fixed;
+    background: linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.4)), url('assets/bgbckgroundimage.png') no-repeat center center fixed;
     background-size: cover;
     color: #0f172a;
     padding: 30px 15px;
