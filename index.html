@@ -30,12 +30,18 @@
             <div class="global-section">
                 <div class="input-group">
                     <label for="deity">Deity Name (ദേവത)</label>
-                    <input type="text" id="deity" list="deityList" placeholder="e.g. Shiva / ശിവൻ" autocomplete="off">
+                    <div class="input-with-arrow">
+                        <input type="text" id="deity" list="deityList" placeholder="e.g. Shiva / ശിവൻ" autocomplete="off">
+                        <button type="button" class="dropdown-arrow-btn" onclick="triggerDatalist('deity')" aria-label="Toggle Dropdown">▼</button>
+                    </div>
                 </div>
 
                 <div class="input-group">
                     <label for="pooja"> Pooja Name (വഴിപാട്)</label>
-                    <input type="text" id="pooja" list="poojaList" placeholder="e.g. Pushpanjali / പുഷ്പാഞ്ജലി" autocomplete="off">
+                    <div class="input-with-arrow">
+                        <input type="text" id="pooja" list="poojaList" placeholder="e.g. Pushpanjali / പുഷ്പാഞ്ജലി" autocomplete="off">
+                        <button type="button" class="dropdown-arrow-btn" onclick="triggerDatalist('pooja')" aria-label="Toggle Dropdown">▼</button>
+                    </div>
                 </div>
 
                 <div class="input-group offering-date-group">
@@ -118,7 +124,10 @@
                         <input type="text" class="item-name" placeholder="Name" autocomplete="off">
                     </div>
                     <div class="item-cell col-flex-1">
-                        <input type="text" list="starList" class="item-star" placeholder="Star" autocomplete="off">
+                        <div class="input-with-arrow">
+                            <input type="text" list="starList" class="item-star" placeholder="Star" autocomplete="off">
+                            <button type="button" class="dropdown-arrow-btn" onclick="triggerRowStarDropdown(this)" aria-label="Toggle Dropdown">▼</button>
+                        </div>
                     </div>
                     <div class="item-cell col-qty">
                         <input type="number" class="item-quantity" placeholder="Qty" value="1" min="1">

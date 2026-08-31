@@ -942,6 +942,29 @@ function exportHistoryToCSV() {
     document.body.removeChild(link);
 }
 
+// --- MOBILE DROPDOWN TRIGGER HELPERS ---
+function triggerDatalist(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.focus();
+    if (typeof input.showPicker === 'function') {
+        try { input.showPicker(); } catch (e) {}
+    }
+}
+
+function triggerRowStarDropdown(btn) {
+    const wrapper = btn.closest('.input-with-arrow');
+    if (wrapper) {
+        const input = wrapper.querySelector('.item-star');
+        if (input) {
+            input.focus();
+            if (typeof input.showPicker === 'function') {
+                try { input.showPicker(); } catch (e) {}
+            }
+        }
+    }
+}
+
 // Attach event listeners for pooja auto fill & manual edit tracking
 document.addEventListener("DOMContentLoaded", () => {
     const poojaInput = document.getElementById("pooja");

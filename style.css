@@ -110,6 +110,47 @@ body {
     flex: 1 1 200px;
 }
 
+/* Input with Dropdown Arrow Styling for Mobile & Desktop */
+.input-with-arrow {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-arrow input {
+    width: 100%;
+    padding-right: 36px !important;
+}
+
+.dropdown-arrow-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #e2e8f0;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 3;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.dropdown-arrow-btn:active,
+.dropdown-arrow-btn:hover {
+    background: #cbd5e1;
+    color: #0f172a;
+}
+
 .input-group.offering-date-group {
     flex: 0 1 170px;
 }
