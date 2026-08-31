@@ -901,6 +901,47 @@ function autoFillPoojaPrice() {
     }
 }
 
+// --- PRODUCTION DATA BACKUP: EXPORT TO CSV ---
+function exportHistoryToCSV() {
+    if (!allHistoryReceipts || allHistoryReceipts.length === 0) {
+        alert("No history records available to export.");
+        return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // \uFEFF for Malayalam UTF-8 BOM encoding in Excel
+    csvContent += "Receipt No,Booking Date,Offering Date,Deity,Pooja,Devotee Name,Star,Qty,Amount,Total Amount\n";
+
+    allHistoryReceipts.forEach(r => {
+        const lineItems = typeof r.line_items_json === 'string' ? JSON.parse(r.line_items_json || '[]') : (r.line_items_json || []);
+        const rNo = `"${r.receipt_no || ''}"`;
+        const bDate = `"${r.booking_date || ''}"`;
+        const oDate = `"${r.offering_date || ''}"`;
+        const deity = `"${r.deity || ''}"`;
+        const pooja = `"${r.pooja || ''}"`;
+        const grandTotal = `"${r.grand_total || 0}"`;
+
+        if (lineItems.length > 0) {
+            lineItems.forEach(item => {
+                const name = `"${item.name || ''}"`;
+                const star = `"${item.star || ''}"`;
+                const qty = `"${item.qty || 1}"`;
+                const amt = `"${item.amount || 0}"`;
+                csvContent += `${rNo},${bDate},${oDate},${deity},${pooja},${name},${star},${qty},${amt},${grandTotal}\n`;
+            });
+        } else {
+            csvContent += `${rNo},${bDate},${oDate},${deity},${pooja},"","","1","0",${grandTotal}\n`;
+        }
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Temple_Receipts_Backup_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 // Attach event listeners for pooja auto fill & manual edit tracking
 document.addEventListener("DOMContentLoaded", () => {
     const poojaInput = document.getElementById("pooja");
