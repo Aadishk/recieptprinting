@@ -273,7 +273,7 @@ app.get('/api/receipts', async (req, res) => {
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                 });
                 const list = await fetchRes.json();
-                if (fetchRes.ok && Array.isArray(list) && list.length > 0) {
+                if (fetchRes.ok && Array.isArray(list)) {
                     return res.json({ success: true, receipts: list });
                 }
             } catch (cErr) {
