@@ -96,19 +96,20 @@ body {
 .global-section {
     width: 100%;
     display: flex;
+    flex-direction: column;
     gap: 16px;
     margin-bottom: 22px;
     padding-bottom: 20px;
     border-bottom: 1.5px dashed #e2e8f0;
-    flex-wrap: wrap;
+    box-sizing: border-box;
 }
 
 .input-group {
     display: flex;
     flex-direction: column;
     gap: 7px;
-    flex: 1 1 220px;
     width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
 }
 
@@ -118,10 +119,13 @@ body {
     width: 100%;
     display: flex;
     align-items: center;
+    box-sizing: border-box;
 }
 
 .input-with-arrow input {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
     padding-right: 38px !important;
 }
 
@@ -146,14 +150,25 @@ body {
 }
 
 .input-group.offering-date-group {
-    flex: 1 1 220px;
-    width: 100%;
-}
-
-input[type="date"] {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+}
+
+input[type="date"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #fcf8f8;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 11px 15px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    min-height: 44px;
 }
 
 .input-group label,
