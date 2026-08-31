@@ -382,25 +382,33 @@ app.delete('/api/receipts/:id', async (req, res) => {
         const id = req.params.id;
 
         if (isCloudDb) {
-            await fetch(`${SUPABASE_URL}/rest/v1/receipts?or=(id.eq.${id},receipt_no.eq.${id})`, {
-                method: 'DELETE',
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
-            return res.json({ success: true });
+            try {
+                const isNumeric = !isNaN(Number(id));
+                const query = isNumeric 
+                    ? `or=(id.eq.${id},receipt_no.eq.${encodeURIComponent(id)})` 
+                    : `receipt_no=eq.${encodeURIComponent(id)}`;
+
+                await fetch(`${SUPABASE_URL}/rest/v1/receipts?${query}`, {
+                    method: 'DELETE',
+                    headers: { 
+                        'apikey': SUPABASE_KEY, 
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=representation'
+                    }
+                });
+            } catch (err) {
+                console.warn("Supabase delete notice:", err.message);
+            }
         }
 
         if (db.isFallback) {
-            const deleted = db.deleteReceipt(id);
-            if (deleted) return res.json({ success: true, deleted });
-            return res.status(404).json({ success: false, message: 'Receipt not found' });
+            db.deleteReceipt(id);
+            return res.json({ success: true });
         }
 
         const stmt = db.prepare('DELETE FROM receipts WHERE id = ? OR receipt_no = ?');
-        const info = stmt.run(id, id);
-        if (info.changes > 0) {
-            return res.json({ success: true });
-        }
-        res.status(404).json({ success: false, message: 'Receipt not found' });
+        stmt.run(id, id);
+        return res.json({ success: true });
     } catch (err) {
         console.error('Error deleting receipt:', err);
         res.status(500).json({ success: false, error: err.message });
@@ -411,11 +419,18 @@ app.delete('/api/receipts/:id', async (req, res) => {
 app.delete('/api/receipts', async (req, res) => {
     try {
         if (isCloudDb) {
-            await fetch(`${SUPABASE_URL}/rest/v1/receipts?id=gt.0`, {
-                method: 'DELETE',
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
-            return res.json({ success: true, message: 'All receipts deleted' });
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/receipts?id=gt.0`, {
+                    method: 'DELETE',
+                    headers: { 
+                        'apikey': SUPABASE_KEY, 
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=representation'
+                    }
+                });
+            } catch (err) {
+                console.warn("Supabase clear all notice:", err.message);
+            }
         }
 
         if (db.isFallback) {
