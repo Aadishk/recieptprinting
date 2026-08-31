@@ -42,16 +42,31 @@ function initDb(database) {
 }
 
 function createFallbackDb() {
-    const dbFile = path.join(__dirname, 'receipts_db.json');
+    let dbFile = path.join(__dirname, 'receipts_db.json');
+    const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+    if (isServerless) {
+        dbFile = path.join('/tmp', 'receipts_db.json');
+    }
+
     let data = { receipts: [], lastId: 0 };
+    
+    // Check /tmp or local file
     if (fs.existsSync(dbFile)) {
         try {
             data = JSON.parse(fs.readFileSync(dbFile, 'utf8'));
         } catch (e) {}
+    } else if (fs.existsSync(path.join(__dirname, 'receipts_db.json'))) {
+        try {
+            data = JSON.parse(fs.readFileSync(path.join(__dirname, 'receipts_db.json'), 'utf8'));
+        } catch (e) {}
     }
 
     function save() {
-        fs.writeFileSync(dbFile, JSON.stringify(data, null, 2));
+        try {
+            fs.writeFileSync(dbFile, JSON.stringify(data, null, 2));
+        } catch (err) {
+            console.warn("Serverless DB write notice:", err.message);
+        }
     }
 
     return {
@@ -325,24 +340,28 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-const server = app.listen(PORT, () => {
-    console.log(`====================================================`);
-    console.log(` Temple Receipt Backend Server Running!`);
-    console.log(` Local URL: http://localhost:${PORT}`);
-    console.log(`====================================================`);
-});
+if (require.main === module) {
+    const server = app.listen(PORT, () => {
+        console.log(`====================================================`);
+        console.log(` Temple Receipt Backend Server Running!`);
+        console.log(` Local URL: http://localhost:${PORT}`);
+        console.log(`====================================================`);
+    });
 
-server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-        const altPort = PORT + 1;
-        console.log(`Port ${PORT} in use, trying alternate port ${altPort}...`);
-        app.listen(altPort, () => {
-            console.log(`====================================================`);
-            console.log(` Temple Receipt Backend Server Running!`);
-            console.log(` Local URL: http://localhost:${altPort}`);
-            console.log(`====================================================`);
-        });
-    } else {
-        console.error(err);
-    }
-});
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            const altPort = PORT + 1;
+            console.log(`Port ${PORT} in use, trying alternate port ${altPort}...`);
+            app.listen(altPort, () => {
+                console.log(`====================================================`);
+                console.log(` Temple Receipt Backend Server Running!`);
+                console.log(` Local URL: http://localhost:${altPort}`);
+                console.log(`====================================================`);
+            });
+        } else {
+            console.error(err);
+        }
+    });
+}
+
+module.exports = app;

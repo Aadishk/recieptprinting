@@ -49,11 +49,31 @@ Open your web browser and navigate to:
 
 ---
 
+## ☁️ Deploying to Vercel
+
+This repository is **100% pre-configured for Vercel Serverless Deployment**:
+
+### Option 1: Via Vercel CLI
+```bash
+npm i -g vercel
+vercel
+```
+
+### Option 2: Via GitHub / Vercel Dashboard
+1. Push this repository to GitHub or GitLab.
+2. Go to [vercel.com/new](https://vercel.com/new) and import the repository.
+3. Keep default settings (`Framework Preset: Other` or `Express`).
+4. Click **Deploy**. Vercel will automatically detect `vercel.json` and `api/index.js`!
+
+---
+
 ## 📁 File Structure
 
 - `index.html` — Main UI, receipt form, history modal, and printable report templates.
 - `style.css` — Modern responsive styling, glassmorphism UI, and `@media print` rules.
 - `script.js` — Client-side event handling, live calculations, auto-fill logic, and filter engine.
-- `server.js` — Express backend API with SQLite support and fallback JSON storage.
+- `server.js` — Express backend API with SQLite support and serverless fallback DB.
+- `api/index.js` — Vercel Serverless Function entrypoint.
+- `vercel.json` — Vercel routing configuration.
 - `receipts_db.json` — Local JSON database for receipt history storage.
 - `manglish.js` — Malayalam transliteration engine.
