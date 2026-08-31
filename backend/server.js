@@ -156,15 +156,58 @@ if (!db.isFallback) {
     initDb(db);
 }
 
+// --- CLOUD DATABASE (SUPABASE / POSTGRES) SUPPORT ---
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+const isCloudDb = Boolean(SUPABASE_URL && SUPABASE_KEY);
+
+if (isCloudDb) {
+    console.log('Online Cloud Database Active (Supabase):', SUPABASE_URL);
+}
+
 // --- API ENDPOINTS ---
 
 // 1. Create & Save New Receipt
-app.post('/api/receipts', (req, res) => {
+app.post('/api/receipts', async (req, res) => {
     try {
         const { deity, pooja, offering_date, booking_date, grand_total, line_items } = req.body;
 
         const lineItemsJson = JSON.stringify(line_items || []);
         const todayStr = booking_date || new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+
+        if (isCloudDb) {
+            const countRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=id`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const countData = await countRes.json();
+            const totalCount = Array.isArray(countData) ? countData.length : 0;
+            const year = new Date().getFullYear();
+            const receiptNo = `REC-${year}-${String(totalCount + 1).padStart(4, '0')}`;
+
+            const payload = {
+                receipt_no: receiptNo,
+                deity: deity || '',
+                pooja: pooja || '',
+                offering_date: offering_date || '',
+                booking_date: todayStr,
+                grand_total: parseFloat(grand_total) || 0,
+                line_items_json: lineItemsJson,
+                created_at: new Date().toISOString()
+            };
+
+            const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify(payload)
+            });
+            const insertedData = await insertRes.json();
+            return res.json({ success: true, receipt: Array.isArray(insertedData) ? insertedData[0] : payload });
+        }
 
         if (db.isFallback) {
             const saved = db.createReceipt({
@@ -209,8 +252,16 @@ app.post('/api/receipts', (req, res) => {
 });
 
 // 2. Fetch All Receipts / Search History
-app.get('/api/receipts', (req, res) => {
+app.get('/api/receipts', async (req, res) => {
     try {
+        if (isCloudDb) {
+            const fetchRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=*&order=id.desc`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const list = await fetchRes.json();
+            return res.json({ success: true, receipts: Array.isArray(list) ? list : [] });
+        }
+
         if (db.isFallback) {
             const list = db.getReceipts(req.query);
             return res.json({ success: true, receipts: list });
@@ -255,8 +306,20 @@ app.get('/api/receipts', (req, res) => {
 });
 
 // 3. Get Single Receipt
-app.get('/api/receipts/:id', (req, res) => {
+app.get('/api/receipts/:id', async (req, res) => {
     try {
+        if (isCloudDb) {
+            const id = req.params.id;
+            const fetchRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?or=(id.eq.${id},receipt_no.eq.${id})`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const list = await fetchRes.json();
+            if (Array.isArray(list) && list.length > 0) {
+                return res.json({ success: true, receipt: list[0] });
+            }
+            return res.status(404).json({ success: false, message: 'Receipt not found' });
+        }
+
         if (db.isFallback) {
             const item = db.getReceiptById(req.params.id);
             if (!item) return res.status(404).json({ success: false, message: 'Receipt not found' });
@@ -295,9 +358,18 @@ app.get('/api/summary', (req, res) => {
 });
 
 // 5. Delete Single Receipt by ID
-app.delete('/api/receipts/:id', (req, res) => {
+app.delete('/api/receipts/:id', async (req, res) => {
     try {
         const id = req.params.id;
+
+        if (isCloudDb) {
+            await fetch(`${SUPABASE_URL}/rest/v1/receipts?or=(id.eq.${id},receipt_no.eq.${id})`, {
+                method: 'DELETE',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            return res.json({ success: true });
+        }
+
         if (db.isFallback) {
             const deleted = db.deleteReceipt(id);
             if (deleted) return res.json({ success: true, deleted });
@@ -317,8 +389,16 @@ app.delete('/api/receipts/:id', (req, res) => {
 });
 
 // 6. Clear Entire Receipts History
-app.delete('/api/receipts', (req, res) => {
+app.delete('/api/receipts', async (req, res) => {
     try {
+        if (isCloudDb) {
+            await fetch(`${SUPABASE_URL}/rest/v1/receipts?id=gt.0`, {
+                method: 'DELETE',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            return res.json({ success: true, message: 'All receipts deleted' });
+        }
+
         if (db.isFallback) {
             db.deleteAllReceipts();
             return res.json({ success: true, message: 'All receipts deleted' });
