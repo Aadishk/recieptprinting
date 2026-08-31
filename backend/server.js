@@ -177,13 +177,13 @@ app.post('/api/receipts', async (req, res) => {
 
         if (isCloudDb) {
             try {
-                const countRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=id`, {
+                const maxRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=id&order=id.desc&limit=1`, {
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                 });
-                const countData = await countRes.json();
-                const totalCount = Array.isArray(countData) ? countData.length : 0;
+                const maxData = await maxRes.json();
+                const maxId = (Array.isArray(maxData) && maxData.length > 0 && maxData[0].id) ? parseInt(maxData[0].id) : 0;
                 const year = new Date().getFullYear();
-                const receiptNo = `REC-${year}-${String(totalCount + 1).padStart(4, '0')}`;
+                const receiptNo = `REC-${year}-${String(maxId + 1).padStart(4, '0')}`;
 
                 const payload = {
                     receipt_no: receiptNo,
@@ -192,8 +192,7 @@ app.post('/api/receipts', async (req, res) => {
                     offering_date: offering_date || '',
                     booking_date: todayStr,
                     grand_total: parseFloat(grand_total) || 0,
-                    line_items_json: lineItemsJson,
-                    created_at: new Date().toISOString()
+                    line_items_json: lineItemsJson
                 };
 
                 const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts`, {
@@ -215,10 +214,10 @@ app.post('/api/receipts', async (req, res) => {
                     }
                     return res.json({ success: true, receipt: saved });
                 } else {
-                    console.warn("Supabase insert notice (falling back to memory):", insertedData);
+                    console.error("Supabase insert error:", insertedData);
                 }
             } catch (cloudErr) {
-                console.warn("Supabase connection notice:", cloudErr.message);
+                console.error("Supabase connection error:", cloudErr.message);
             }
         }
 
