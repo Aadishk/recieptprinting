@@ -176,37 +176,50 @@ app.post('/api/receipts', async (req, res) => {
         const todayStr = booking_date || new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
 
         if (isCloudDb) {
-            const countRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=id`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
-            const countData = await countRes.json();
-            const totalCount = Array.isArray(countData) ? countData.length : 0;
-            const year = new Date().getFullYear();
-            const receiptNo = `REC-${year}-${String(totalCount + 1).padStart(4, '0')}`;
+            try {
+                const countRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=id`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                const countData = await countRes.json();
+                const totalCount = Array.isArray(countData) ? countData.length : 0;
+                const year = new Date().getFullYear();
+                const receiptNo = `REC-${year}-${String(totalCount + 1).padStart(4, '0')}`;
 
-            const payload = {
-                receipt_no: receiptNo,
-                deity: deity || '',
-                pooja: pooja || '',
-                offering_date: offering_date || '',
-                booking_date: todayStr,
-                grand_total: parseFloat(grand_total) || 0,
-                line_items_json: lineItemsJson,
-                created_at: new Date().toISOString()
-            };
+                const payload = {
+                    receipt_no: receiptNo,
+                    deity: deity || '',
+                    pooja: pooja || '',
+                    offering_date: offering_date || '',
+                    booking_date: todayStr,
+                    grand_total: parseFloat(grand_total) || 0,
+                    line_items_json: lineItemsJson,
+                    created_at: new Date().toISOString()
+                };
 
-            const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts`, {
-                method: 'POST',
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=representation'
-                },
-                body: JSON.stringify(payload)
-            });
-            const insertedData = await insertRes.json();
-            return res.json({ success: true, receipt: Array.isArray(insertedData) ? insertedData[0] : payload });
+                const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const insertedData = await insertRes.json();
+
+                if (insertRes.ok && (Array.isArray(insertedData) || insertedData.id || insertedData.receipt_no)) {
+                    const saved = Array.isArray(insertedData) ? insertedData[0] : payload;
+                    if (db.isFallback && db.createReceipt) {
+                        try { db.createReceipt({ ...payload }); } catch (e) {}
+                    }
+                    return res.json({ success: true, receipt: saved });
+                } else {
+                    console.warn("Supabase insert notice (falling back to memory):", insertedData);
+                }
+            } catch (cloudErr) {
+                console.warn("Supabase connection notice:", cloudErr.message);
+            }
         }
 
         if (db.isFallback) {
@@ -255,11 +268,17 @@ app.post('/api/receipts', async (req, res) => {
 app.get('/api/receipts', async (req, res) => {
     try {
         if (isCloudDb) {
-            const fetchRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=*&order=id.desc`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
-            const list = await fetchRes.json();
-            return res.json({ success: true, receipts: Array.isArray(list) ? list : [] });
+            try {
+                const fetchRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=*&order=id.desc`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                const list = await fetchRes.json();
+                if (fetchRes.ok && Array.isArray(list) && list.length > 0) {
+                    return res.json({ success: true, receipts: list });
+                }
+            } catch (cErr) {
+                console.warn("Supabase fetch notice:", cErr.message);
+            }
         }
 
         if (db.isFallback) {
