@@ -1,128 +1,356 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Receipt Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@100..900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>വള്ളിയോട്ടുചാൽ ശ്രീ ഭദ്രകാളി കലശസ്ഥാനം | വഴിപാട് റെസിപ്റ്റ്</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@300;400;600;700;800&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <h2>Receipt Generator</h2>
+    <div class="app-container">
+        <!-- Hero Title Banner -->
+        <header class="app-header">
+            <div class="header-badge">വഴിപാട്</div>
+            <h1>വള്ളിയോട്ടുചാൽ ശ്രീ ഭദ്രകാളി കലശസ്ഥാനം</h1>
+            
+        </header>
 
-    <div class="form-section">
-        <div class="global-section" style="width: 100%; display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
-            <input type="text" id="deity" placeholder="Deity Name">
-            <input type="text" id="pooja" placeholder="Pooja Name">
-            <input type="date" id="offeringDate" title="Offering Date">
-        </div>
+        <!-- Main Form Container -->
+        <main class="form-section">
 
-        <div id="lineItemsContainer" style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
-            <div class="line-item" style="display: flex; gap: 10px; align-items: center;">
-                <input type="text" class="item-name" placeholder="Name">
-                <input type="text" list="starList" class="item-star" placeholder="Star">
-                <input type="number" class="item-quantity" placeholder="Qty" value="1" style="flex: 0 1 80px;">
-                <input type="number" class="item-amount" placeholder="Amount" style="flex: 0 1 100px;">
-                <button type="button" class="remove-btn" onclick="removeRow(this)" style="background-color: #dc3545; padding: 10px; flex: 0 0 auto;">X</button>
+            <!-- Global Deity & Pooja Details -->
+            <div class="global-section">
+                <div class="input-group">
+                    <label for="deity">Deity Name (ദേവത)</label>
+                    <input type="text" id="deity" list="deityList" placeholder="e.g. Shiva / ശിവൻ" autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <label for="pooja"> Pooja Name (വഴിപാട്)</label>
+                    <input type="text" id="pooja" list="poojaList" placeholder="e.g. Pushpanjali / പുഷ്പാഞ്ജലി" autocomplete="off">
+                </div>
+
+                <div class="input-group offering-date-group">
+                    <label for="offeringDate"> Offering Date (തീയതി)</label>
+                    <input type="date" id="offeringDate">
+                </div>
+            </div>
+
+            <!-- Datalist Options -->
+            <datalist id="deityList">
+                <option value="ഭൈരവാദി പഞ്ചമൂർത്തികൾ">
+                <option value="മാരണ ഗുളികൻ">
+                <option value="കരിംഗുളികൻ">
+                <option value="ഭഗവതി">
+                <option value="ഭദ്രകാളി">
+                <option value="കാപാളത്തി">
+                <option value="കണ്ഠാകർണൻ">
+
+                    </option>
+            </datalist>
+
+            <datalist id="poojaList">
+                <option value="കരിംകലശം" data-price="7500">
+                <option value="രക്തപുഷ്പാഞ്ജലി" data-price="50">
+                <option value="അർച്ചന" data-price="20">
+                <option value="ശക്തിപൂജ (വലുത്)" data-price="500">
+                <option value="ശക്തിപൂജ" data-price="500">
+                <option value="നെയ്‌വിളക്ക്" data-price="50">
+                <option value="കടുമ്പായസം" data-price="300">
+                <option value="എള്ള്പായസം" data-price="800">
+                <option value="നിവേദ്യം" data-price="50">
+                <option value="ദേഹരക്ഷ" data-price="150">
+                <option value="വാരാഹി യന്ത്രം" data-price="300">
+                <option value="പഞ്ചാമൃതം" data-price="80">
+            </datalist>
+
+            <datalist id="starList">
+                <option value="അശ്വതി">
+                <option value="രോഹിണി">
+                <option value="ഭരണി">
+                <option value="കാർത്തിക">
+                <option value="മകീര്യം">
+                <option value="തിരുവാതിര">
+                <option value="പുണർതം">
+                <option value="പൂയം">
+                <option value="ആയില്യം">
+                <option value="മകം">
+                <option value="പൂരം">
+                <option value="ഉത്രം">
+                <option value="അത്തം">
+                <option value="ചിത്തിര">
+                <option value="ചോതി">
+                <option value="വിശാഖം">
+                <option value="അനിഴം">
+                <option value="തൃക്കേട്ട">
+                <option value="മൂലം">
+                <option value="പൂരാടം">
+                <option value="ഉത്രാടം">
+                <option value="തിരുവോണം">
+                <option value="അവിട്ടം">
+                <option value="ചതയം">
+                <option value="പൂരുരുട്ടാതി">
+                <option value="ഉത്രട്ടാതി">
+                <option value="രേവതി">
+            </datalist>
+
+            <!-- Line Items Header -->
+            <div id="lineItemsHeader" class="line-item-header">
+                <div class="header-col col-flex-1"><label> Name (പേര്)</label></div>
+                <div class="header-col col-flex-1"><label> Star (നക്ഷത്രം)</label></div>
+                <div class="header-col col-qty"><label> Qty (എണ്ണം)</label></div>
+                <div class="header-col col-amt"><label> Amount (തുക)</label></div>
+                <div class="header-col col-action"></div>
+            </div>
+
+            <!-- Line Items Container -->
+            <div id="lineItemsContainer" class="line-items-wrapper">
+                <div class="line-item">
+                    <div class="item-cell col-flex-1">
+                        <input type="text" class="item-name" placeholder="Name" autocomplete="off">
+                    </div>
+                    <div class="item-cell col-flex-1">
+                        <input type="text" list="starList" class="item-star" placeholder="Star" autocomplete="off">
+                    </div>
+                    <div class="item-cell col-qty">
+                        <input type="number" class="item-quantity" placeholder="Qty" value="1" min="1">
+                    </div>
+                    <div class="item-cell col-amt">
+                        <input type="number" class="item-amount" placeholder="Amount" min="0">
+                    </div>
+                    <div class="item-cell col-action">
+                        <button type="button" class="remove-btn" onclick="removeRow(this)"
+                            title="Remove item">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Action Buttons -->
+            <div class="button-action-bar">
+                <button type="button" class="btn btn-add" onclick="addNewRow()">Add Row</button>
+                <button type="button" class="btn btn-remove-row" onclick="removeLastRow()">Remove Row</button>
+                <button type="button" class="btn btn-generate" onclick="generateReceipt()">Generate Receipt</button>
+                <button type="button" class="btn btn-pdf" onclick="downloadJPEG()">Download JPEG</button>
+                <button type="button" class="btn btn-print" onclick="printReceipt()">Print Receipt</button>
+                <button type="button" class="btn btn-history" onclick="openHistoryModal()">View History</button>
+                <button type="button" class="btn btn-switch" onclick="toggleBackground()">Switch Background</button>
+                <button type="button" class="btn btn-save btn-full-width" onclick="saveReceipt()">Save Receipt</button>
+            </div>
+        </main>
+
+        <!-- Generated Receipt Output Container -->
+        <section id="receipt" class="receipt-preview-card">
+            <img src="blank paper.png" id="template" alt="Receipt Template">
+
+            <div id="receiptHeaderLeft" style="visibility: hidden;">
+                <div id="receiptNoContainer">Receipt No : <span id="receiptNoText"></span></div>
+                <div id="deityContainer">ദേവത : <span id="deityText"></span></div>
+            </div>
+
+            <div id="receiptHeaderRight" style="visibility: hidden;">
+                <div id="bookingDateContainer">Booking Date : <span id="bookingDateText"></span></div>
+                <div id="offeringDateContainer">Offering Date : <span id="offeringDateText"></span></div>
+            </div>
+
+            <div id="poojaHeadingContainer" style="visibility: hidden;">
+                വഴിപാട് : <span id="poojaHeadingText"></span>
+            </div>
+
+            <div id="receiptTableContainer" style="visibility: hidden;">
+                <table id="receiptTable">
+                    <thead>
+                        <tr>
+                            <th id="th-sno">ക്രമ നമ്പർ </th>
+                            <th id="th-name">പേര് </th>
+                            <th id="th-star">നക്ഷത്രം </th>
+                            <th id="th-quantity">എണ്ണം</th>
+                            <th id="th-amount">തുക</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receiptTableBody">
+                        <!-- Rows dynamically injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="grandTotalBox" style="visibility: hidden;">
+                <span>ആകെ തുക :</span> &nbsp;&nbsp;<span id="totalAmountText"></span>
+            </div>
+
+            <div id="dateText"></div>
+        </section>
+    </div>
+
+    <!-- Receipt History Modal -->
+    <div id="historyModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Issued Receipt History & Analytics</h3>
+                <button type="button" class="modal-close-btn" onclick="closeHistoryModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- Filter Controls Toolbar -->
+                <div class="history-filter-bar">
+                    <div class="filter-item filter-search">
+                        <input type="text" id="historySearchInput" class="history-input" placeholder="Search Name, Receipt No, Deity..." oninput="applyHistoryFilters()">
+                    </div>
+                    <div class="filter-item">
+                        <select id="historyPoojaFilter" class="history-select" onchange="applyHistoryFilters()">
+                            <option value="">All Poojas (എല്ലാ വഴിപാടുകളും)</option>
+                            <option value="കരിംകലശം">കരിംകലശം</option>
+                            <option value="രക്തപുഷ്പാഞ്ജലി">രക്തപുഷ്പാഞ്ജലി</option>
+                            <option value="അർച്ചന">അർച്ചന</option>
+                            <option value="ശക്തിപൂജ (വലുത്)">ശക്തിപൂജ (വലുത്)</option>
+                            <option value="ശക്തിപൂജ">ശക്തിപൂജ</option>
+                            <option value="നെയ്‌വിളക്ക്">നെയ്‌വിളക്ക്</option>
+                            <option value="കടുമ്പായസം">കടുമ്പായസം</option>
+                            <option value="എള്ള്പായസം">എള്ള്പായസം</option>
+                            <option value="നിവേദ്യം">നിവേദ്യം</option>
+                            <option value="ദേഹരക്ഷ">ദേഹരക്ഷ</option>
+                            <option value="വാരാഹി യന്ത്രം">വാരാഹി യന്ത്രം</option>
+                            <option value="പഞ്ചാമൃതം">പഞ്ചാമൃതം</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <select id="historyDateType" class="history-select" onchange="applyHistoryFilters()">
+                            <option value="both">All Dates (Any)</option>
+                            <option value="offering">Offering Date (വഴിപാട് തീയതി)</option>
+                            <option value="booking">Created Date (റെസിപ്റ്റ് തീയതി)</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <input type="date" id="historyDateFilter" class="history-input" oninput="applyHistoryFilters()" onchange="applyHistoryFilters()" title="Filter by Selected Date">
+                    </div>
+                    <div class="filter-item">
+                        <select id="historySortFilter" class="history-select" onchange="applyHistoryFilters()">
+                            <option value="DESC">Newest Date First</option>
+                            <option value="ASC">Oldest Date First</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <button type="button" class="btn-sm btn-clear-filter" onclick="clearHistoryFilters()">Clear Filters</button>
+                    </div>
+                    <div class="filter-item">
+                        <button type="button" class="btn-sm btn-print-report" onclick="printHistoryReport()">Print Report List</button>
+                    </div>
+                    <div class="filter-item">
+                        <button type="button" class="btn-sm btn-delete-all-history" onclick="clearAllHistoryRecords()">Clear All History</button>
+                    </div>
+                </div>
+
+                <!-- Stats Summary Badge Bar -->
+                <div id="historyStatsBar" class="history-stats-bar">
+                    <span class="stat-badge">Devotees: <strong id="statTotalPeople">0</strong></span>
+                    <span class="stat-badge">Total Receipts: <strong id="statTotalReceipts">0</strong></span>
+                    <span class="stat-badge stat-highlight">Total Collection: <strong id="statTotalAmount">₹0</strong></span>
+                </div>
+
+                <!-- Table Container -->
+                <div class="table-responsive">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Offering Date (വഴിപാട്)</th>
+                                <th>Created Date (റെസിപ്റ്റ്)</th>
+                                <th>Receipt No</th>
+                                <th>Deity (ദേവത)</th>
+                                <th>Pooja (വഴിപാട്)</th>
+                                <th>Devotees & Stars (പേര് & നക്ഷത്രം)</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Injected by script.js -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        
-        <datalist id="starList">
-            <option value="അശ്വതി">
-            <option value="രോഹിണി">
-            <option value="ഭരണി">
-            <option value="കാർത്തിക">
-            <option value="മകീര്യം">
-            <option value="തിരുവാതിര">
-            <option value="പുണർതം">
-            <option value="പൂയം">
-            <option value="ആയില്യം">
-            <option value="മകം">
-            <option value="പൂരം">
-            <option value="ഉത്രം">
-            <option value="അത്തം">
-            <option value="ചിത്തിര">
-            <option value="ചോതി">
-            <option value="വിശാഖം">
-            <option value="അനിഴം">
-            <option value="തൃക്കേട്ട">
-            <option value="മൂലം">
-            <option value="പൂരാടം">
-            <option value="ഉത്രാടം">
-            <option value="തിരുവോണം">
-            <option value="അവിട്ടം">
-            <option value="ചതയം">
-            <option value="പൂരുരുട്ടാതി">
-            <option value="ഉത്രട്ടാതി">
-            <option value="രേവതി">
-        </datalist>
-
-        <div style="width: 100%; display: flex; gap: 10px; margin-top: 15px;">
-            <button type="button" onclick="addNewRow()" style="background-color: #28a745;">
-                + Add New Row
-            </button>
-            <button type="button" onclick="generateReceipt()">
-                Generate Receipt
-            </button>
-            <button type="button" onclick="downloadPDF()">
-                Download PDF
-            </button>
-            <button type="button" onclick="toggleBackground()" style="background-color: #17a2b8;">
-                Switch Background
-            </button>
-        </div>
     </div>
 
-    <div id="receipt">
+    <!-- Hidden Printable Report Template (A4 Document Format) -->
+    <div id="historyPrintReport" class="history-print-document">
+        <header class="report-header">
+            <h2>വള്ളിയോട്ടുചാൽ ശ്രീ ഭദ്രകാളി കലശസ്ഥാനം</h2>
+            <h3 id="reportTitle">വഴിപാട് ലിസ്റ്റ് (POOJA REPORT)</h3>
+            <p id="reportSubMeta" class="report-meta"></p>
+        </header>
 
-        <img
-            src="blank paper.png"
-            id="template">
-
-        <div id="receiptHeaderLeft" style="visibility: hidden;">
-            <div id="receiptNoContainer">Receipt No : <span id="receiptNoText"></span></div>
-            <div id="deityContainer">ദേവത : <span id="deityText"></span></div>
-        </div>
-        
-        <div id="receiptHeaderRight" style="visibility: hidden;">
-            <div id="bookingDateContainer">Booking Date : <span id="bookingDateText"></span></div>
-            <div id="offeringDateContainer">Offering Date : <span id="offeringDateText"></span></div>
-        </div>
-        
-        <div id="poojaHeadingContainer" style="visibility: hidden;">
-            വഴിപാട് : <span id="poojaHeadingText"></span>
-        </div>
-        
-        <div id="receiptTableContainer" style="visibility: hidden;">
-            <table id="receiptTable">
-                <thead>
-                    <tr>
-                        <th id="th-sno">ക്രമ നമ്പർ </th>
-                        <th id="th-name">പേര് </th>
-                        <th id="th-star">നക്ഷത്രം </th>
-                        <th id="th-quantity">എണ്ണം</th>
-                        <th id="th-amount">തുക</th>
-                    </tr>
-                </thead>
-                <tbody id="receiptTableBody">
-                    <!-- Rows will be dynamically injected here -->
-                </tbody>
-            </table>
+        <div class="report-summary-box">
+            <div><span class="lbl">Filter Criteria:</span> <strong id="repFilterCriteria">All</strong></div>
+            <div><span class="lbl">Total Devotees:</span> <strong id="repTotalPeople">0</strong></div>
+            <div><span class="lbl">Total Collection:</span> <strong id="repTotalAmount">₹0</strong></div>
+            <div><span class="lbl">Report Date:</span> <strong id="repGeneratedDate"></strong></div>
         </div>
 
-        <div id="grandTotalBox" style="visibility: hidden;">
-        <span >ആകെ തുക :</span> &nbsp;&nbsp;<span id="totalAmountText"></span>
-        </div>
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th style="width: 45px;">S.No</th>
+                    <th>പേര് (Devotee Name)</th>
+                    <th>നക്ഷത്രം (Star)</th>
+                    <th>വഴിപാട് (Pooja Name)</th>
+                    <th>വഴിപാട് തീയതി (Offering Date)</th>
+                    <th>എണ്ണം (Qty)</th>
+                    <th>തുക (Amount)</th>
+                    <th>റെസിപ്റ്റ് നം. (Receipt No)</th>
+                </tr>
+            </thead>
+            <tbody id="reportTableBody">
+                <!-- Injected dynamically by script.js -->
+            </tbody>
+        </table>
 
-        <div id="dateText"></div>
+        <footer class="report-footer">
+            <div class="sign-block">
+                <div>തീയതി: <span id="repFooterDate"></span></div>
+                <div class="sign-title">അധികാരി / സെക്രട്ടറി ഒപ്പ്</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dedicated Shakthi Pooja Print Document Template -->
+    <div id="shakthiPoojaPrintReport" class="shakthi-print-document">
+        <header class="shakthi-report-header">
+            <h2>വള്ളിയോട്ടുചാൽ ശ്രീ ഭദ്രകാളി കലശസ്ഥാനം</h2>
+            <h3>വഴിപാട് ലിസ്റ്റ്</h3>
+            <div class="shakthi-date-header">
+                വഴിപാട് തീയതി: <strong id="shakthiHeaderDate"></strong>
+            </div>
+            <div class="shakthi-pooja-banner">
+                വഴിപാട്: <strong id="shakthiHeaderPoojaName">ശക്തിപൂജ</strong>
+            </div>
+        </header>
+
+        <table class="shakthi-report-table">
+            <thead>
+                <tr>
+                    <th style="width: 55px;">Sl No</th>
+                    <th>പേര് (Devotee Name)</th>
+                    <th>നക്ഷത്രം (Star)</th>
+                    <th style="width: 160px;">റെസിപ്റ്റ് നം. (Receipt No)</th>
+                </tr>
+            </thead>
+            <tbody id="shakthiReportTableBody">
+                <!-- Injected dynamically by script.js -->
+            </tbody>
+        </table>
 
     </div>
 
-
-
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+    <script src="manglish.js"></script>
     <script src="script.js"></script>
 
 </body>

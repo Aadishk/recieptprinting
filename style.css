@@ -1,83 +1,800 @@
+/* ==========================================================================
+   TEMPLE RECEIPT GENERATOR - INTERACTIVE PREMIUM STYLING
+   ========================================================================== */
+
 * {
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Removes horizontal scrollbar */
+    overflow-x: hidden;
     width: 100%;
+    min-height: 100vh;
 }
 
 body {
-    font-family: 'Noto Sans Malayalam', sans-serif;
-    padding: 20px 10px;
-    background-color: #f4f4f9;
+    font-family: 'Outfit', 'Noto Sans Malayalam', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.4)), url('bgbckgroundimage.png') no-repeat center center fixed;
+    background-size: cover;
+    color: #0f172a;
+    padding: 30px 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
 }
 
-h2 {
-    color: #333;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.form-section {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 40px;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
+/* App Container Wrapper */
+.app-container {
     width: 100%;
+    max-width: 860px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* --- Hero Header --- */
+.app-header {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #ffffff;
+}
+
+.header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #cbd5e1;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #854d0e;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.app-header h1 {
+    font-size: 30px;
+    font-weight: 800;
+    margin: 0 0 6px 0;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+.app-header .subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* --- Interactive Main Form Section --- */
+.form-section {
+    width: 100%;
+    background: rgb(255, 255, 255);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 28px 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.6);
+    margin-bottom: 35px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-section:hover {
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+/* --- Global Section (Deity, Pooja, Date) --- */
+.global-section {
+    width: 100%;
+    display: flex;
+    gap: 16px;
+    margin-bottom: 22px;
+    padding-bottom: 20px;
+    border-bottom: 1.5px dashed #e2e8f0;
+    flex-wrap: wrap;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex: 1 1 200px;
+}
+
+.input-group.offering-date-group {
+    flex: 0 1 170px;
+}
+
+.input-group label,
+.line-item-header label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* --- Input Fields Styling --- */
 input {
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    width: 100%;
+    padding: 11px 15px;
+    background: #fcf8f8;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
     outline: none;
     font-size: 14px;
-    flex: 1 1 120px;
-    min-width: 0; /* Prevents overflow in flex containers */
+    font-family: 'Outfit', 'Noto Sans Malayalam', sans-serif;
+    color: #0f172a;
+    font-weight: 500;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+input:hover {
+    border-color: #94a3b8;
+    background: #ffffff;
 }
 
 input:focus {
-    border-color: #007bff;
+    border-color: #6366f1;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
 }
 
-button {
-    padding: 10px 20px;
-    margin: 5px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
+/* --- Line Items Header & Section --- */
+.line-item-header {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 0 6px;
+}
+
+.header-col {
+    display: flex;
+    align-items: center;
+}
+
+.col-flex-1 {
+    flex: 2 1 0;
+    min-width: 0;
+}
+
+.col-qty {
+    flex: 0 0 65px;
+}
+
+.col-amt {
+    flex: 0 0 90px;
+}
+
+.col-action {
+    flex: 0 0 36px;
+}
+
+.line-items-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.line-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: #ffffff;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    transition: all 0.25s ease;
+    animation: slideDown 0.3s ease-out;
+}
+
+.line-item:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+}
+
+.item-cell {
+    display: flex;
+    align-items: center;
+}
+
+/* Remove button */
+.remove-btn {
+    width: 36px;
+    height: 36px;
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+    border-radius: 9px;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.3s;
-    flex: 1 1 auto;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
 }
 
-button:hover {
-    background-color: #0056b3;
+.remove-btn:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
 }
 
+.remove-btn:active {
+    transform: scale(0.96);
+}
+
+/* --- Action Buttons Bar --- */
+.button-action-bar {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    flex: 1 1 150px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    filter: brightness(1.06);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-add {
+    background-color: #16a34a;
+}
+
+.btn-add:hover {
+    background-color: #15803d;
+}
+
+.btn-remove-row {
+    background-color: #dc2626;
+}
+
+.btn-remove-row:hover {
+    background-color: #b91c1c;
+}
+
+.btn-generate {
+    background-color: #2563eb;
+}
+
+.btn-generate:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-save {
+    background-color: #16a34a;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 14px 24px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+}
+
+.btn-save:hover {
+    background-color: #15803d;
+    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.45);
+}
+
+.btn-full-width {
+    flex: 1 1 100%;
+    width: 100%;
+    margin-top: 6px;
+}
+
+.btn-pdf {
+    background-color: #d97706;
+}
+
+.btn-pdf:hover {
+    background-color: #b45309;
+}
+
+.btn-print {
+    background-color: #4f46e5;
+}
+
+.btn-print:hover {
+    background-color: #4338ca;
+}
+
+.btn-history {
+    background-color: #475569;
+}
+
+.btn-history:hover {
+    background-color: #334155;
+}
+
+.btn-switch {
+    background-color: #0891b2;
+}
+
+.btn-switch:hover {
+    background-color: #0e7490;
+}
+
+/* --- Receipt History Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(6px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: #ffffff;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 780px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    animation: slideDown 0.25s ease-out;
+}
+
+.modal-header {
+    padding: 16px 22px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1e293b;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: #64748b;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+.modal-close-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.history-filter-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.filter-item {
+    flex: 1 1 140px;
+}
+
+.filter-item.filter-search {
+    flex: 2 1 200px;
+}
+
+.history-input,
+.history-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #ffffff;
+    color: #0f172a;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.history-input:focus,
+.history-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.btn-clear-filter {
+    background: #e2e8f0;
+    color: #475569;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+}
+
+.btn-clear-filter:hover {
+    background: #cbd5e1;
+    color: #0f172a;
+}
+
+.btn-print-report {
+    background: #16a34a;
+    color: #ffffff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
+}
+
+.btn-print-report:hover {
+    background: #15803d;
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.4);
+}
+
+.btn-delete-all-history {
+    background: #dc2626;
+    color: #ffffff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+}
+
+.btn-delete-all-history:hover {
+    background: #b91c1c;
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.4);
+}
+
+.btn-delete-record {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-delete-record:hover {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+}
+
+.history-stats-bar {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+}
+
+.stat-badge {
+    font-size: 13px;
+    color: #1e3a8a;
+}
+
+.stat-badge.stat-highlight {
+    color: #15803d;
+    font-weight: 700;
+}
+
+.date-badge {
+    display: inline-block;
+    background: #f1f5f9;
+    color: #334155;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+}
+
+.date-badge.offering-badge {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+.date-badge.booking-badge {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.pooja-badge {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid #fde68a;
+}
+
+.devotee-item {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #1e293b;
+}
+
+.devotee-star {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.devotee-qty {
+    color: #2563eb;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.history-table th, .history-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.history-table th {
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 700;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-reprint {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-reprint:hover {
+    background: #1d4ed8;
+}
+
+/* --- Manglish Transliteration UI Styles --- */
+.manglish-control-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #eff6ff 0%, #f0fdf4 100%);
+    padding: 10px 18px;
+    border-radius: 14px;
+    border: 1px solid #bfdbfe;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.06);
+}
+
+.manglish-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.manglish-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.manglish-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.manglish-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 26px;
+}
+
+.manglish-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.manglish-switch input:checked+.manglish-slider {
+    background-color: #10b981;
+}
+
+.manglish-switch input:checked+.manglish-slider:before {
+    transform: translateX(22px);
+}
+
+.manglish-label {
+    font-size: 14px;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.manglish-status {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    background-color: #64748b;
+    color: white;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+}
+
+.manglish-status.active {
+    background-color: #10b981;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+/* Suggestion Popup */
+.manglish-popup {
+    position: absolute;
+    z-index: 10000;
+    background: #ffffff;
+    border: 1.5px solid #6366f1;
+    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+    font-family: 'Noto Sans Malayalam', sans-serif;
+}
+
+.manglish-popup-item {
+    padding: 9px 14px;
+    font-size: 15px;
+    cursor: pointer;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s;
+}
+
+.manglish-popup-item:last-child {
+    border-bottom: none;
+}
+
+.manglish-popup-item:hover,
+.manglish-popup-item.active {
+    background-color: #6366f1;
+    color: #ffffff;
+}
+
+.manglish-sug-num {
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+.manglish-sug-text {
+    font-weight: 600;
+}
+
+/* --- Receipt Preview Canvas --- */
 #receipt {
     position: relative;
-    width: 800px; /* Fixed width for perfect PDF generation */
-    box-shadow: 0 4px 10px rgb(249, 0, 0);
-    border-radius: 8px;
+    width: 800px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 25px rgba(245, 158, 11, 0.25);
+    border-radius: 12px;
     overflow: hidden;
     transform-origin: top center;
+    background: #ffffff;
+    transition: transform 0.2s ease;
 }
 
 #template {
@@ -86,12 +803,8 @@ button:hover {
     height: auto;
 }
 
-/* 
-  Using exact pixel positions. 
-  Responsiveness is handled by JS scale() so html2pdf works correctly. 
-*/
-
-#receipt div, #receipt table {
+#receipt div,
+#receipt table {
     font-size: 15px;
     font-weight: bold;
     color: #333;
@@ -121,7 +834,7 @@ button:hover {
     font-weight: bolder;
 }
 
-#poojaHeadingText{
+#poojaHeadingText {
     font-size: 18px;
     font-weight: 900;
 }
@@ -137,8 +850,8 @@ button:hover {
 }
 
 #receiptTable {
-    width: calc(100% - 16px); /* Adjusted to accommodate even margins */
-    margin: 0 10px; /* Even margin on both left and right sides */
+    width: calc(100% - 16px);
+    margin: 0 10px;
     border-collapse: separate;
     border-spacing: 0;
     text-align: center;
@@ -146,7 +859,7 @@ button:hover {
 
 #receiptTable th {
     border: 1px solid #4f0101;
-    border-right: none; /* Prevents double borders */
+    border-right: none;
     padding: 6px;
     background-color: #bea70c9f;
     font-weight: bold;
@@ -159,7 +872,7 @@ button:hover {
 }
 
 #receiptTable th:last-child {
-    border-right: 1px solid #4f0101; /* Restore right border for the last cell */
+    border-right: 1px solid #4f0101;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
 }
@@ -167,14 +880,13 @@ button:hover {
 #receiptTable td {
     padding: 10px 6px;
     font-weight: bold;
-
 }
 
 #grandTotalBox {
     position: absolute;
     bottom: 70px;
     right: 40px;
-    background-color: #f8c51e72; /* Mustard yellow */
+    background-color: #f8c51e72;
     padding: 8px 40px;
     font-size: 15px !important;
     font-weight: bolder;
@@ -186,13 +898,31 @@ button:hover {
     display: none;
 }
 
+/* Animations */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @page {
     size: auto;
     margin: 0mm;
 }
 
-/* --- Print Styles for Native PDF Saving --- */
+/* --- Print Styles --- */
 @media print {
+    html, body {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+    }
 
     * {
         -webkit-print-color-adjust: exact !important;
@@ -203,14 +933,16 @@ button:hover {
     body * {
         visibility: hidden;
     }
-    
+
     body {
         margin: 0;
         padding: 0;
-        background-color: white;
+        background-color: white !important;
+        background-image: none !important;
     }
 
-    #receipt, #receipt * {
+    #receipt,
+    #receipt * {
         visibility: visible;
     }
 
@@ -222,4 +954,345 @@ button:hover {
         box-shadow: none;
         transform: scale(1) !important;
     }
+}
+
+/* --- Mobile Responsive Layout Optimizations --- */
+@media (max-width: 640px) {
+    body {
+        padding: 12px 8px;
+    }
+
+    .form-section {
+        padding: 18px 12px;
+        border-radius: 16px;
+    }
+
+    .global-section {
+        gap: 12px;
+    }
+
+    .input-group {
+        flex: 1 1 100%;
+    }
+
+    .input-group.offering-date-group {
+        flex: 1 1 100%;
+    }
+
+    .line-item-header {
+        gap: 6px;
+        padding: 0 4px;
+    }
+
+    .line-item-header label {
+        font-size: 11px;
+        letter-spacing: -0.2px;
+    }
+
+    .line-item {
+        gap: 6px;
+        padding: 6px 6px;
+    }
+
+    .col-flex-1 {
+        flex: 2.5 1 0;
+        min-width: 0;
+    }
+
+    .col-qty {
+        flex: 0 0 48px;
+    }
+
+    .col-amt {
+        flex: 0 0 68px;
+    }
+
+    .col-action {
+        flex: 0 0 32px;
+    }
+
+    .line-item input {
+        padding: 8px 6px;
+        font-size: 13px;
+    }
+
+    .remove-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+        border-radius: 7px;
+    }
+
+    .button-action-bar {
+        gap: 8px;
+    }
+
+    .btn {
+        padding: 11px 12px;
+        font-size: 13px;
+        flex: 1 1 45%;
+    }
+
+    .btn-full-width {
+        flex: 1 1 100%;
+    }
+}
+
+/* --- Printable Report Document Styling (A4 Format) --- */
+#historyPrintReport {
+    display: none;
+    background: #ffffff;
+    color: #000000;
+    font-family: 'Noto Sans Malayalam', 'Outfit', sans-serif;
+    padding: 20px 25px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.report-header {
+    text-align: center;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.report-header h2 {
+    margin: 0 0 6px 0;
+    font-size: 22px;
+    font-weight: 800;
+    color: #000000;
+}
+
+.report-header h3 {
+    margin: 0 0 4px 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #333333;
+}
+
+.report-meta {
+    margin: 0;
+    font-size: 13px;
+    color: #555555;
+}
+
+.report-summary-box {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
+.report-summary-box .lbl {
+    color: #475569;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+.report-table th,
+.report-table td {
+    border: 1px solid #000000;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+.report-table th {
+    background-color: #f1f5f9;
+    font-weight: 700;
+    color: #000000;
+}
+
+.report-footer {
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px dashed #666666;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sign-block {
+    text-align: center;
+    min-width: 200px;
+    font-size: 13px;
+}
+
+.sign-title {
+    margin-top: 40px;
+    font-weight: 700;
+    border-top: 1px solid #000000;
+    padding-top: 4px;
+}
+
+/* Print specific rules for History Report */
+html.is-printing-report,
+body.is-printing-report {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+}
+
+body.is-printing-report * {
+    visibility: hidden !important;
+}
+
+body.is-printing-report #historyPrintReport,
+body.is-printing-report #historyPrintReport * {
+    visibility: visible !important;
+}
+
+body.is-printing-report #historyPrintReport {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 15mm 15mm !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+/* --- Dedicated Shakthi Pooja Print Document Styling --- */
+#shakthiPoojaPrintReport {
+    display: none;
+    background: #ffffff;
+    color: #000000;
+    font-family: 'Noto Sans Malayalam', 'Outfit', sans-serif;
+    padding: 20px 25px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.shakthi-report-header {
+    text-align: center;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+}
+
+.shakthi-report-header h2 {
+    margin: 0 0 4px 0;
+    font-size: 24px;
+    font-weight: 800;
+    color: #000000;
+}
+
+.shakthi-report-header h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.shakthi-date-header {
+    display: inline-block;
+    background: #f1f5f9;
+    border: 1.5px solid #000000;
+    border-radius: 6px;
+    padding: 6px 18px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 6px;
+}
+
+.shakthi-pooja-banner {
+    display: block;
+    margin: 8px auto 0 auto;
+    width: fit-content;
+    background: #fef3c7;
+    border: 1.5px solid #000000;
+    border-radius: 6px;
+    padding: 6px 20px;
+    font-size: 16px;
+    font-weight: 800;
+    color: #000000;
+}
+
+.shakthi-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+.shakthi-report-table th {
+    border: 1.5px solid #000000;
+    padding: 10px 14px;
+    text-align: left;
+    background-color: #f1f5f9;
+    font-weight: 800;
+    color: #000000;
+    font-size: 15px;
+}
+
+.shakthi-report-table td {
+    border: 1.5px solid #000000;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+}
+
+.shakthi-report-footer {
+    margin-top: 40px;
+    padding-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.shakthi-blessing {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333333;
+}
+
+/* Print specific rules for Shakthi Pooja Report */
+html.is-printing-shakthi-report,
+body.is-printing-shakthi-report {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+}
+
+body.is-printing-shakthi-report * {
+    visibility: hidden !important;
+}
+
+body.is-printing-shakthi-report #shakthiPoojaPrintReport,
+body.is-printing-shakthi-report #shakthiPoojaPrintReport * {
+    visibility: visible !important;
+}
+
+body.is-printing-shakthi-report #shakthiPoojaPrintReport {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 15mm 15mm !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
 }
