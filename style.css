@@ -107,7 +107,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 7px;
-    flex: 1 1 200px;
+    flex: 1 1 220px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Input with Dropdown Arrow Styling for Mobile & Desktop */
@@ -120,12 +122,12 @@ body {
 
 .input-with-arrow input {
     width: 100%;
-    padding-right: 36px !important;
+    padding-right: 38px !important;
 }
 
 .dropdown-arrow-btn {
     position: absolute;
-    right: 6px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
     background: #e2e8f0;
@@ -138,21 +140,20 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    pointer-events: none; /* Passes tap directly to underlying input to trigger native datalist */
     z-index: 3;
     user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.dropdown-arrow-btn:active,
-.dropdown-arrow-btn:hover {
-    background: #cbd5e1;
-    color: #0f172a;
 }
 
 .input-group.offering-date-group {
-    flex: 0 1 170px;
+    flex: 1 1 220px;
+    width: 100%;
+}
+
+input[type="date"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .input-group label,
