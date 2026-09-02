@@ -163,7 +163,11 @@ if (!db.isFallback) {
 }
 
 // --- CLOUD DATABASE (SUPABASE / POSTGRES) SUPPORT ---
-const SUPABASE_URL = (process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '');
+let rawUrl = (process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '');
+if (rawUrl && !rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+    rawUrl = 'https://' + rawUrl;
+}
+const SUPABASE_URL = rawUrl;
 const SUPABASE_KEY = (process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || '').trim();
 const isCloudDb = Boolean(SUPABASE_URL && SUPABASE_KEY);
 
@@ -177,6 +181,16 @@ app.get('/api/db-status', async (req, res) => {
         return res.json({
             isCloudDb: false,
             message: 'SUPABASE_URL or SUPABASE_KEY environment variable is not defined.'
+        });
+    }
+
+    if (SUPABASE_URL.includes('supabase.com/dashboard')) {
+        return res.json({
+            isCloudDb: true,
+            status: 'INVALID_URL_FORMAT',
+            supabaseUrl: SUPABASE_URL,
+            error: 'SUPABASE_URL is currently set to a Supabase Dashboard link instead of the REST API URL.',
+            fix: 'Set SUPABASE_URL in Vercel to https://<your-project-id>.supabase.co (found under Supabase Project Settings -> API -> Project URL).'
         });
     }
 
@@ -213,7 +227,10 @@ app.get('/api/db-status', async (req, res) => {
         return res.json({
             isCloudDb: true,
             status: 'CONNECTION_FAILED',
-            error: e.message
+            error: e.message,
+            errorCause: e.cause ? (e.cause.message || String(e.cause)) : null,
+            supabaseUrl: SUPABASE_URL,
+            hint: 'Verify SUPABASE_URL in Vercel settings. It must be in the format: https://<project-id>.supabase.co'
         });
     }
 });
