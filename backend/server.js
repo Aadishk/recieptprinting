@@ -167,6 +167,9 @@ let rawUrl = (process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '');
 if (rawUrl && !rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
     rawUrl = 'https://' + rawUrl;
 }
+// Strip /rest/v1 suffix if user included it in environment variables
+rawUrl = rawUrl.replace(/\/rest\/v1\/?$/i, '').replace(/\/+$/, '');
+
 const SUPABASE_URL = rawUrl;
 const SUPABASE_KEY = (process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || '').trim();
 const isCloudDb = Boolean(SUPABASE_URL && SUPABASE_KEY);
