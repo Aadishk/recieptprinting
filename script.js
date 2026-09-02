@@ -202,6 +202,110 @@ function generateReceipt() {
     }
 }
 
+// --- LOCAL STORAGE HISTORY PERSISTENCE HELPERS ---
+const LOCAL_STORAGE_HISTORY_KEY = "temple_receipts_history";
+
+function getLocalHistory() {
+    try {
+        const raw = localStorage.getItem(LOCAL_STORAGE_HISTORY_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        console.warn("Error reading local history storage:", e);
+        return [];
+    }
+}
+
+function saveLocalHistory(list) {
+    try {
+        localStorage.setItem(LOCAL_STORAGE_HISTORY_KEY, JSON.stringify(list || []));
+    } catch (e) {
+        console.warn("Error saving local history storage:", e);
+    }
+}
+
+function getReceiptUniqueKey(r) {
+    if (!r) return null;
+    const rNo = r.receipt_no || 'REC';
+    const dateStr = r.booking_date || r.offering_date || (r.created_at ? r.created_at.split('T')[0] : '');
+    const idStr = r.id ? String(r.id) : '';
+    const grandTotal = r.grand_total !== undefined ? String(r.grand_total) : '';
+    return `${rNo}__${dateStr}__${grandTotal}__${idStr}`;
+}
+
+function mergeHistoryLists(serverList = [], localList = []) {
+    const map = new Map();
+    
+    // Process local receipts first
+    (localList || []).forEach(r => {
+        if (!r) return;
+        const key = getReceiptUniqueKey(r);
+        if (key) {
+            if (!r.line_items_json && r.line_items) {
+                r.line_items_json = JSON.stringify(r.line_items);
+            }
+            map.set(key, r);
+        }
+    });
+
+    // Process server receipts (server records override or add to local)
+    (serverList || []).forEach(r => {
+        if (!r) return;
+        const key = getReceiptUniqueKey(r);
+        if (key) {
+            map.set(key, r);
+        }
+    });
+
+    // Convert map values to array and sort descending by timestamp / id
+    const merged = Array.from(map.values());
+    merged.sort((a, b) => {
+        const timeA = a.created_at ? new Date(a.created_at).getTime() : (typeof a.id === 'number' ? a.id : 0);
+        const timeB = b.created_at ? new Date(b.created_at).getTime() : (typeof b.id === 'number' ? b.id : 0);
+        return timeB - timeA;
+    });
+
+    return merged;
+}
+
+function saveReceiptToLocalStore(receiptRecord) {
+    if (!receiptRecord) return;
+    const currentLocal = getLocalHistory();
+    const targetKey = getReceiptUniqueKey(receiptRecord);
+    
+    const existingIndex = currentLocal.findIndex(r => getReceiptUniqueKey(r) === targetKey);
+    if (existingIndex !== -1) {
+        currentLocal[existingIndex] = { ...currentLocal[existingIndex], ...receiptRecord };
+    } else {
+        currentLocal.unshift(receiptRecord);
+    }
+    saveLocalHistory(currentLocal);
+}
+
+function generateFallbackReceiptRecord(payload) {
+    let currentSno = localStorage.getItem("receiptSno") || 1;
+    currentSno = parseInt(currentSno);
+    localStorage.setItem("receiptSno", currentSno + 1);
+    const year = new Date().getFullYear();
+    const receiptNo = `REC-${year}-${String(currentSno).padStart(4, '0')}`;
+    
+    const rNoEl = document.getElementById("receiptNoText");
+    if (rNoEl) {
+        rNoEl.innerText = receiptNo;
+    }
+
+    return {
+        id: Date.now(),
+        receipt_no: receiptNo,
+        deity: payload.deity || '',
+        pooja: payload.pooja || '',
+        offering_date: payload.offering_date || '',
+        booking_date: payload.booking_date || '',
+        grand_total: payload.grand_total || 0,
+        line_items_json: JSON.stringify(payload.line_items || []),
+        created_at: new Date().toISOString()
+    };
+}
+
 async function saveReceipt() {
     // 1. Ensure receipt is rendered on screen
     generateReceipt();
@@ -251,6 +355,8 @@ async function saveReceipt() {
         line_items: lineItemsPayload
     };
 
+    let savedRecord = null;
+
     try {
         const res = await fetch('/api/receipts', {
             method: 'POST',
@@ -260,17 +366,24 @@ async function saveReceipt() {
 
         const data = await res.json();
         if (data && data.success && data.receipt) {
+            savedRecord = data.receipt;
             const rNoEl = document.getElementById("receiptNoText");
-            if (rNoEl) rNoEl.innerText = data.receipt.receipt_no;
-            alert(`Receipt ${data.receipt.receipt_no} saved successfully to database!`);
+            if (rNoEl) rNoEl.innerText = savedRecord.receipt_no;
+            alert(`Receipt ${savedRecord.receipt_no} saved successfully!`);
         } else {
-            fallbackReceiptNo();
-            alert("Receipt generated (local preview mode).");
+            savedRecord = generateFallbackReceiptRecord(payload);
+            alert(`Receipt ${savedRecord.receipt_no} saved locally.`);
         }
     } catch (e) {
-        console.warn("Backend API offline:", e);
-        fallbackReceiptNo();
-        alert("Saved locally in browser preview mode.");
+        console.warn("Backend API offline/error:", e);
+        savedRecord = generateFallbackReceiptRecord(payload);
+        alert(`Receipt ${savedRecord.receipt_no} saved locally in browser storage.`);
+    }
+
+    // Always persist to local browser storage to prevent history loss on server resets
+    if (savedRecord) {
+        saveReceiptToLocalStore(savedRecord);
+        allHistoryReceipts = mergeHistoryLists([], getLocalHistory());
     }
 }
 
@@ -375,29 +488,84 @@ function toggleBackground() {
 // --- RECEIPT HISTORY & BACKEND MODAL HANDLERS ---
 let allHistoryReceipts = [];
 
+function checkDbStatus() {
+    const badge = document.getElementById("dbStatusBadge");
+    if (!badge) return;
+
+    fetch('/api/db-status')
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.isCloudDb && data.status === 'CONNECTED') {
+                badge.innerHTML = `Storage: <strong style="color: #22c55e;">🟢 Supabase Active</strong>`;
+            } else if (data && data.isCloudDb && data.status === 'ERROR') {
+                badge.innerHTML = `Storage: <strong style="color: #f59e0b;" title="${data.errorDetails || ''}">🟡 RLS Policy Alert</strong>`;
+            } else {
+                badge.innerHTML = `Storage: <strong style="color: #3b82f6;">🔵 Browser Storage</strong>`;
+            }
+        })
+        .catch(() => {
+            badge.innerHTML = `Storage: <strong style="color: #64748b;">Browser Storage</strong>`;
+        });
+}
+
 function openHistoryModal() {
     let modal = document.getElementById("historyModal");
     if (!modal) return;
 
     modal.style.display = "flex";
+    checkDbStatus();
     
+    // 1. Immediately show local history from browser storage (no data loss if server restarted)
+    const localRecords = getLocalHistory();
+    allHistoryReceipts = mergeHistoryLists([], localRecords);
+    renderHistoryUI();
+
+    // 2. Fetch latest from backend API and merge with local history
     fetch('/api/receipts')
         .then(res => res.json())
         .then(data => {
-            if (data.success && data.receipts) {
-                allHistoryReceipts = data.receipts;
+            if (data && data.success && Array.isArray(data.receipts)) {
+                const merged = mergeHistoryLists(data.receipts, localRecords);
+                allHistoryReceipts = merged;
+                saveLocalHistory(merged); // sync local storage with merged backend history
                 renderHistoryUI();
             }
         })
         .catch(err => {
-            console.error("Error fetching history:", err);
-            renderHistoryUI();
+            console.warn("Error fetching history from backend (showing local copy):", err);
         });
 }
 
 function closeHistoryModal() {
     let modal = document.getElementById("historyModal");
     if (modal) modal.style.display = "none";
+}
+
+function syncCloudHistory() {
+    const btn = document.querySelector('.btn-sync-cloud');
+    if (btn) btn.innerText = "Syncing...";
+
+    fetch('/api/receipts')
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success && Array.isArray(data.receipts)) {
+                const localRecords = getLocalHistory();
+                const merged = mergeHistoryLists(data.receipts, localRecords);
+                allHistoryReceipts = merged;
+                saveLocalHistory(merged);
+                renderHistoryUI();
+                alert(`Cloud Sync Complete! ${data.receipts.length} receipts fetched from cloud database.`);
+            } else {
+                alert("Cloud Sync Notice: No remote records returned or server is running in local mode.");
+            }
+        })
+        .catch(err => {
+            console.error("Cloud sync error:", err);
+            alert("Unable to sync with cloud server. Please check network connection.");
+        })
+        .finally(() => {
+            if (btn) btn.innerText = "🔄 Sync Cloud";
+        });
 }
 
 function clearHistoryFilters() {
@@ -591,50 +759,81 @@ function renderHistoryUI() {
     }
 }
 
+function populateFormWithReceipt(r) {
+    const rNoEl = document.getElementById("receiptNoText");
+    if (rNoEl) rNoEl.innerText = r.receipt_no || '';
+
+    const deityEl = document.getElementById("deity");
+    const poojaEl = document.getElementById("pooja");
+    if (deityEl) deityEl.value = r.deity || '';
+    if (poojaEl) poojaEl.value = r.pooja || '';
+
+    const offeringEl = document.getElementById("offeringDate");
+    if (offeringEl && r.offering_date) {
+        if (r.offering_date.includes('-')) {
+            const parts = r.offering_date.split('-');
+            if (parts.length === 3 && parts[0].length === 2) {
+                offeringEl.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            } else {
+                offeringEl.value = r.offering_date;
+            }
+        }
+    }
+
+    const lineItems = typeof r.line_items_json === 'string' ? JSON.parse(r.line_items_json || '[]') : (r.line_items_json || []);
+    const container = document.getElementById("lineItemsContainer");
+    if (container) container.innerHTML = "";
+
+    if (lineItems.length > 0 && container) {
+        lineItems.forEach(item => {
+            const row = document.createElement("div");
+            row.className = "line-item";
+            row.innerHTML = `
+                <div class="item-cell col-flex-1">
+                    <input type="text" class="item-name" value="${item.name || ''}" placeholder="Name" autocomplete="off">
+                </div>
+                <div class="item-cell col-flex-1">
+                    <input type="text" list="starList" class="item-star" value="${item.star || ''}" placeholder="Star" autocomplete="off">
+                </div>
+                <div class="item-cell col-qty">
+                    <input type="number" class="item-quantity" value="${item.qty || 1}" placeholder="Qty" min="1">
+                </div>
+                <div class="item-cell col-amt">
+                    <input type="number" class="item-amount" value="${item.amount || ''}" placeholder="Amount" min="0">
+                </div>
+                <div class="item-cell col-action">
+                    <button type="button" class="remove-btn" onclick="removeRow(this)" title="Remove item">✕</button>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+    } else {
+        addNewRow();
+    }
+
+    closeHistoryModal();
+    generateReceipt();
+}
+
 function loadReceiptFromBackend(id) {
+    let foundRecord = allHistoryReceipts.find(r => r.id == id || r.receipt_no === id);
+    if (!foundRecord) {
+        const localList = getLocalHistory();
+        foundRecord = localList.find(r => r.id == id || r.receipt_no === id);
+    }
+
+    if (foundRecord) {
+        populateFormWithReceipt(foundRecord);
+        return;
+    }
+
     fetch(`/api/receipts/${id}`)
         .then(res => res.json())
         .then(data => {
             if (data.success && data.receipt) {
-                const r = data.receipt;
-                const deityEl = document.getElementById("deity");
-                const poojaEl = document.getElementById("pooja");
-                if (deityEl) deityEl.value = r.deity || '';
-                if (poojaEl) poojaEl.value = r.pooja || '';
-
-                const lineItems = typeof r.line_items_json === 'string' ? JSON.parse(r.line_items_json || '[]') : (r.line_items_json || []);
-                const container = document.getElementById("lineItemsContainer");
-                if (container) container.innerHTML = "";
-
-                if (lineItems.length > 0 && container) {
-                    lineItems.forEach(item => {
-                        const row = document.createElement("div");
-                        row.className = "line-item";
-                        row.innerHTML = `
-                            <div class="item-cell col-flex-1">
-                                <input type="text" class="item-name" value="${item.name || ''}" placeholder="Name" autocomplete="off">
-                            </div>
-                            <div class="item-cell col-flex-1">
-                                <input type="text" list="starList" class="item-star" value="${item.star || ''}" placeholder="Star" autocomplete="off">
-                            </div>
-                            <div class="item-cell col-qty">
-                                <input type="number" class="item-quantity" value="${item.qty || 1}" placeholder="Qty" min="1">
-                            </div>
-                            <div class="item-cell col-amt">
-                                <input type="number" class="item-amount" value="${item.amount || ''}" placeholder="Amount" min="0">
-                            </div>
-                            <div class="item-cell col-action">
-                                <button type="button" class="remove-btn" onclick="removeRow(this)" title="Remove item">✕</button>
-                            </div>
-                        `;
-                        container.appendChild(row);
-                    });
-                } else {
-                    addNewRow();
-                }
-
-                closeHistoryModal();
-                generateReceipt();
+                populateFormWithReceipt(data.receipt);
+            } else {
+                alert("Receipt record not found.");
             }
         })
         .catch(e => {
@@ -645,40 +844,30 @@ function loadReceiptFromBackend(id) {
 function deleteReceiptFromBackend(id) {
     if (!confirm("Are you sure you want to delete this receipt record from history?")) return;
 
+    allHistoryReceipts = allHistoryReceipts.filter(r => r.id != id && r.receipt_no !== id);
+    const localList = getLocalHistory().filter(r => r.id != id && r.receipt_no !== id);
+    saveLocalHistory(localList);
+    renderHistoryUI();
+
     fetch(`/api/receipts/${id}`, { method: 'DELETE' })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                allHistoryReceipts = allHistoryReceipts.filter(r => r.id != id && r.receipt_no !== id);
-                renderHistoryUI();
-            } else {
-                alert("Failed to delete receipt.");
-            }
-        })
         .catch(err => {
-            console.error("Error deleting receipt:", err);
-            alert("Error deleting receipt.");
+            console.warn("Error deleting receipt from backend notice:", err);
         });
 }
 
 function clearAllHistoryRecords() {
     if (!confirm("CAUTION: Are you sure you want to ERASE ALL saved receipts from history? This cannot be undone.")) return;
 
+    allHistoryReceipts = [];
+    localStorage.removeItem(LOCAL_STORAGE_HISTORY_KEY);
+    renderHistoryUI();
+
     fetch('/api/receipts', { method: 'DELETE' })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                allHistoryReceipts = [];
-                renderHistoryUI();
-                alert("All history records erased successfully!");
-            } else {
-                alert("Failed to clear history.");
-            }
-        })
         .catch(err => {
-            console.error("Error clearing history:", err);
-            alert("Error clearing history.");
+            console.warn("Error clearing history on backend notice:", err);
         });
+
+    alert("All history records erased successfully!");
 }
 
 function printHistoryReport() {

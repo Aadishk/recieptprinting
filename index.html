@@ -249,6 +249,9 @@
                         </select>
                     </div>
                     <div class="filter-item">
+                        <button type="button" class="btn-sm btn-sync-cloud" onclick="syncCloudHistory()" title="Sync with Cloud Database">🔄 Sync Cloud</button>
+                    </div>
+                    <div class="filter-item">
                         <button type="button" class="btn-sm btn-clear-filter" onclick="clearHistoryFilters()">Clear Filters</button>
                     </div>
                     <div class="filter-item">
@@ -264,6 +267,7 @@
 
                 <!-- Stats Summary Badge Bar -->
                 <div id="historyStatsBar" class="history-stats-bar">
+                    <span class="stat-badge" id="dbStatusBadge">Storage: <strong>Checking...</strong></span>
                     <span class="stat-badge">Devotees: <strong id="statTotalPeople">0</strong></span>
                     <span class="stat-badge">Total Receipts: <strong id="statTotalReceipts">0</strong></span>
                     <span class="stat-badge stat-highlight">Total Collection: <strong id="statTotalAmount">₹0</strong></span>

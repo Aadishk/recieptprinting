@@ -79,15 +79,21 @@ function createFallbackDb() {
             };
         },
         createReceipt: function (receiptObj) {
+            if (!data.lastId || data.lastId < 1000) {
+                const maxExisting = (data.receipts || []).reduce((max, r) => Math.max(max, typeof r.id === 'number' ? r.id : 0), 0);
+                // Use timestamp-offset fallback so IDs never reset to 0001 after serverless cold starts
+                const timeSeq = Math.floor(Date.now() / 1000) % 100000;
+                data.lastId = Math.max(maxExisting, timeSeq);
+            }
             data.lastId++;
             const id = data.lastId;
             const year = new Date().getFullYear();
-            const receipt_no = `REC-${year}-${String(id).padStart(4, '0')}`;
+            const receipt_no = receiptObj.receipt_no || `REC-${year}-${String(id).padStart(4, '0')}`;
             const newRecord = {
                 id,
                 receipt_no,
                 ...receiptObj,
-                created_at: new Date().toISOString()
+                created_at: receiptObj.created_at || new Date().toISOString()
             };
             data.receipts.unshift(newRecord);
             save();
@@ -157,13 +163,60 @@ if (!db.isFallback) {
 }
 
 // --- CLOUD DATABASE (SUPABASE / POSTGRES) SUPPORT ---
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+const SUPABASE_URL = (process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '');
+const SUPABASE_KEY = (process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || '').trim();
 const isCloudDb = Boolean(SUPABASE_URL && SUPABASE_KEY);
 
 if (isCloudDb) {
     console.log('Online Cloud Database Active (Supabase):', SUPABASE_URL);
 }
+
+// --- DIAGNOSTIC ENDPOINT FOR DATABASE HEALTH ---
+app.get('/api/db-status', async (req, res) => {
+    if (!isCloudDb) {
+        return res.json({
+            isCloudDb: false,
+            message: 'SUPABASE_URL or SUPABASE_KEY environment variable is not defined.'
+        });
+    }
+
+    try {
+        const testRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=count`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Prefer': 'count=exact'
+            }
+        });
+
+        const status = testRes.status;
+        const text = await testRes.text();
+
+        if (testRes.ok) {
+            return res.json({
+                isCloudDb: true,
+                status: 'CONNECTED',
+                supabaseUrl: SUPABASE_URL,
+                details: text
+            });
+        } else {
+            return res.json({
+                isCloudDb: true,
+                status: 'ERROR',
+                httpStatus: status,
+                supabaseUrl: SUPABASE_URL,
+                errorDetails: text,
+                hint: 'Row Level Security (RLS) on Supabase "receipts" table may be blocking access. Disable RLS or create an ALLOW policy for anon role.'
+            });
+        }
+    } catch (e) {
+        return res.json({
+            isCloudDb: true,
+            status: 'CONNECTION_FAILED',
+            error: e.message
+        });
+    }
+});
 
 // --- API ENDPOINTS ---
 
@@ -177,13 +230,21 @@ app.post('/api/receipts', async (req, res) => {
 
         if (isCloudDb) {
             try {
-                const maxRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=id&order=id.desc&limit=1`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                });
-                const maxData = await maxRes.json();
-                const maxId = (Array.isArray(maxData) && maxData.length > 0 && maxData[0].id) ? parseInt(maxData[0].id) : 0;
+                let nextSeq = 1;
+                try {
+                    const maxRes = await fetch(`${SUPABASE_URL}/rest/v1/receipts?select=id&order=id.desc&limit=1`, {
+                        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                    });
+                    const maxData = await maxRes.json();
+                    if (Array.isArray(maxData) && maxData.length > 0 && maxData[0].id) {
+                        nextSeq = parseInt(maxData[0].id) + 1;
+                    }
+                } catch (e) {
+                    console.warn("Supabase maxId query notice:", e.message);
+                }
+
                 const year = new Date().getFullYear();
-                const receiptNo = `REC-${year}-${String(maxId + 1).padStart(4, '0')}`;
+                const receiptNo = `REC-${year}-${String(nextSeq).padStart(4, '0')}`;
 
                 const payload = {
                     receipt_no: receiptNo,
@@ -212,12 +273,18 @@ app.post('/api/receipts', async (req, res) => {
                     if (db.isFallback && db.createReceipt) {
                         try { db.createReceipt({ ...payload }); } catch (e) {}
                     }
-                    return res.json({ success: true, receipt: saved });
+                    return res.json({ success: true, receipt: saved, source: 'supabase' });
                 } else {
-                    console.error("Supabase insert error:", insertedData);
+                    console.error("Supabase insert rejected:", insertedData);
+                    return res.status(400).json({
+                        success: false,
+                        error: "Supabase rejected insert: " + (insertedData.message || JSON.stringify(insertedData)),
+                        hint: "Disable Row Level Security (RLS) on Supabase 'receipts' table or add an INSERT policy."
+                    });
                 }
             } catch (cloudErr) {
                 console.error("Supabase connection error:", cloudErr.message);
+                return res.status(500).json({ success: false, error: "Supabase connection error: " + cloudErr.message });
             }
         }
 
@@ -230,7 +297,7 @@ app.post('/api/receipts', async (req, res) => {
                 grand_total: parseFloat(grand_total) || 0,
                 line_items_json: lineItemsJson
             });
-            return res.json({ success: true, receipt: saved });
+            return res.json({ success: true, receipt: saved, source: 'local' });
         }
 
         // SQLite Implementation
@@ -256,7 +323,7 @@ app.post('/api/receipts', async (req, res) => {
         );
 
         const newReceipt = db.prepare('SELECT * FROM receipts WHERE id = ?').get(result.lastInsertRowid);
-        res.json({ success: true, receipt: newReceipt });
+        res.json({ success: true, receipt: newReceipt, source: 'sqlite' });
     } catch (err) {
         console.error('Error saving receipt:', err);
         res.status(500).json({ success: false, error: err.message });
@@ -273,16 +340,24 @@ app.get('/api/receipts', async (req, res) => {
                 });
                 const list = await fetchRes.json();
                 if (fetchRes.ok && Array.isArray(list)) {
-                    return res.json({ success: true, receipts: list });
+                    return res.json({ success: true, receipts: list, source: 'supabase' });
+                } else {
+                    console.warn("Supabase fetch notice:", list);
+                    return res.status(400).json({
+                        success: false,
+                        error: "Supabase fetch notice: " + (list.message || JSON.stringify(list)),
+                        hint: "Disable Row Level Security (RLS) on Supabase 'receipts' table or add a SELECT policy."
+                    });
                 }
             } catch (cErr) {
-                console.warn("Supabase fetch notice:", cErr.message);
+                console.warn("Supabase fetch exception:", cErr.message);
+                return res.status(500).json({ success: false, error: "Supabase fetch error: " + cErr.message });
             }
         }
 
         if (db.isFallback) {
             const list = db.getReceipts(req.query);
-            return res.json({ success: true, receipts: list });
+            return res.json({ success: true, receipts: list, source: 'local' });
         }
 
         const { search, pooja, date, sort } = req.query;
@@ -316,7 +391,7 @@ app.get('/api/receipts', async (req, res) => {
 
         const stmt = db.prepare(sql);
         const receipts = stmt.all(...params);
-        res.json({ success: true, receipts });
+        res.json({ success: true, receipts, source: 'sqlite' });
     } catch (err) {
         console.error('Error fetching receipts:', err);
         res.status(500).json({ success: false, error: err.message });
